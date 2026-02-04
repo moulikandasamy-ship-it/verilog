@@ -1,0 +1,17 @@
+module all_gates (
+    input  wire A,
+    input  wire B,
+    output wire AND_out,
+    output wire OR_out,
+    output wire NOT_out,
+    output wire NAND_out,
+    output wire NOR_out
+);
+
+    assign AND_out  = A & B;
+    assign OR_out   = A | B;
+    assign NOT_out  = ~A;        
+    assign NAND_out = ~(A & B);
+    assign NOR_out  = ~(A | B);
+
+endmodule
