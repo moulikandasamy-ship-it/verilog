@@ -27,7 +27,7 @@ module full_adder_tb;
         $monitor("%0t\t%b %b  %b  |  %b    %b",
                   $time, a, b, cin, sum, cout);
 
-        // Apply all 8 input combinations
+        
         a = 0; b = 0; cin = 0; #10;
         a = 0; b = 0; cin = 1; #10;
         a = 0; b = 1; cin = 0; #10;
