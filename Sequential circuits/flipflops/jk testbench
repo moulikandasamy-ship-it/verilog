@@ -5,7 +5,7 @@ module tb_jk_ff;
 reg j, k, clk, rst;
 wire q;
 
-// Instantiate DUT
+
 jk_ff uut (
     .j(j),
     .k(k),
@@ -18,11 +18,11 @@ jk_ff uut (
 always #5 clk = ~clk;
 
 initial begin
-    // Dump for GTKWave
+   
     $dumpfile("jk_ff.vcd");
     $dumpvars(0, tb_jk_ff);
 
-    // Initialize
+ 
     clk = 0;
     rst = 1;
     j = 0;
@@ -30,7 +30,6 @@ initial begin
 
     #10 rst = 0;
 
-    // Test cases
     #10 j = 0; k = 0; 
     #10 j = 0; k = 1; 
     #10 j = 1; k = 0; 
