@@ -1,0 +1,67 @@
+module sequence_detector(
+    input clk,
+    input rst,
+    input din,
+    output reg dout
+);
+
+reg [1:0] state, nextstate;
+
+
+always @(posedge clk or posedge rst)
+begin
+    if(rst)
+        state <= 2'b00;
+    else
+        state <= nextstate;
+end
+
+
+always @(*)
+begin
+    case(state)
+
+        2'b00: begin
+            if(din)
+                nextstate = 2'b01;
+            else
+                nextstate = 2'b00;
+            dout = 0;
+        end
+
+        2'b01: begin
+            if(din)
+                nextstate = 2'b01;
+            else
+                nextstate = 2'b10;
+            dout = 0;
+        end
+
+        2'b10: begin
+            if(din)
+                nextstate = 2'b11;
+            else
+                nextstate = 2'b00;
+            dout = 0;
+        end
+
+        2'b11: begin
+            if(din) begin
+                nextstate = 2'b01;
+                dout = 1;
+            end
+            else begin
+                nextstate = 2'b10;
+                dout = 0;
+            end
+        end
+
+        default: begin
+            nextstate = 2'b00;
+            dout = 0;
+        end
+
+    endcase
+end
+
+endmodule
