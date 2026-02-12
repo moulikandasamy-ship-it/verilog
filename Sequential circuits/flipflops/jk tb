@@ -1,0 +1,41 @@
+module tb_jk_ff;
+
+reg j, k, clk, rst;
+wire q;
+
+
+jk_ff uut (
+    .j(j),
+    .k(k),
+    .clk(clk),
+    .rst(rst),
+    .q(q)
+);
+
+
+always #5 clk = ~clk;
+
+initial begin
+   
+    $dumpfile("jk_ff.vcd");
+    $dumpvars(0, tb_jk_ff);
+
+ 
+    clk = 0;
+    rst = 1;
+    j = 0;
+    k = 0;
+
+    #10 rst = 0;
+
+    #10 j = 0; k = 0; 
+    #10 j = 0; k = 1; 
+    #10 j = 1; k = 0; 
+    #10 j = 1; k = 1; 
+    #10 j = 1; k = 1; 
+    #10 j = 0; k = 0; 
+
+    #20 $finish;
+end
+
+endmodule
