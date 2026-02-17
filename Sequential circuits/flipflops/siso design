@@ -1,0 +1,24 @@
+module siso_3bit (
+    input clk,      
+    input rst_n,  
+    input din,     
+    output dout    
+);
+
+    
+    reg [2:0] shift_reg;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+          
+            shift_reg <= 3'b000;
+        end else begin
+          
+            shift_reg <= {din, shift_reg[2:1]};
+        end
+    end
+
+   
+    assign dout = shift_reg[0];
+
+endmodule
