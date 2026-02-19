@@ -1,0 +1,55 @@
+module tb_updown_counter;
+
+    reg        clk;
+    reg        rst;
+    reg        en;
+    reg        up_down;
+    wire [3:0] count;
+
+    updown_counter dut (
+        .clk(clk),
+        .rst(rst),
+        .en(en),
+        .up_down(up_down),
+        .count(count)
+    );
+
+    always #5 clk = ~clk;
+
+    initial begin
+       
+        $dumpfile("updown_counter.vcd");
+        $dumpvars(0, tb_updown_counter);
+
+     
+        clk     = 0;
+        rst     = 1;
+        en      = 0;
+        up_down = 1;
+
+      
+        #10 rst = 0;
+
+        #10 en = 1; up_down = 1;  
+        #40;                       
+
+       
+        #10 en = 0;
+        #20;
+
+       
+        #10 en = 1; up_down = 0;   
+        #40;
+
+        #20 $finish;
+    end
+
+   
+    initial begin
+        $monitor(
+            "T=%0t | en=%b | up_down=%b | count=%b",
+             $time,   en,    up_down,    count
+        );
+    end
+
+endmodule
