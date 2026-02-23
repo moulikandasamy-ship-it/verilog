@@ -1,0 +1,24 @@
+module bidirectionalregister (
+  input clk,
+  input rst,
+  input sr_in,
+  input sl_in,
+  input [1:0] mode,
+  output reg [2:0] q
+);
+
+  always @(posedge clk or posedge rst) begin
+    if (rst)
+      q <= 3'b000;
+    else begin
+      case (mode)
+        2'b00: q <= q;                      
+        2'b01: q <= {sr_in, q[2:1]};       
+        2'b10: q <= {q[1:0], sl_in};        
+        2'b11: q <= {q[0], q[2:1]};         
+        default: q <= q;
+      endcase
+    end
+  end
+
+endmodule
