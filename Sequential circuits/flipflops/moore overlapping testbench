@@ -1,0 +1,42 @@
+module tb_moore_overlap_1101;
+
+  reg clk;
+  reg rst;
+  reg din;
+  wire y;
+
+  moore_overlap_1101 dut (
+    .clk(clk),
+    .rst(rst),
+    .din(din),
+    .y(y)
+  );
+
+  always #5 clk = ~clk;
+
+  initial begin
+    clk = 0;
+    rst = 1;
+    din = 0;
+
+    $dumpfile("moore_overlap_1101.vcd");
+    $dumpvars(0, tb_moore_overlap_1101);
+
+    #10 rst = 0;
+
+    #10 din = 1;
+    #10 din = 1;
+    #10 din = 0;
+    #10 din = 1;  
+
+    #10 din = 1;
+    #10 din = 0;
+    #10 din = 1;   
+    #20 $finish;
+  end
+
+  initial begin
+    $monitor("T=%0t | din=%b | y=%b", $time, din, y);
+  end
+
+endmodule
