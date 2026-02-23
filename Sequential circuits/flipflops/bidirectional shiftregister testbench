@@ -1,0 +1,54 @@
+module tb_bidirectionalregister;
+
+  reg clk;
+  reg rst;
+  reg sr_in;
+  reg sl_in;
+  reg [1:0] mode;
+  wire [2:0] q;
+
+  bidirectionalregister dut (
+    .clk(clk),
+    .rst(rst),
+    .sr_in(sr_in),
+    .sl_in(sl_in),
+    .mode(mode),
+    .q(q)
+  );
+
+  always #5 clk = ~clk;
+
+  initial begin
+    clk   = 0;
+    rst   = 1;
+    sr_in = 0;
+    sl_in = 0;
+    mode  = 2'b00;
+
+    $dumpfile("bidirectionalregister.vcd");
+    $dumpvars(0, tb_bidirectionalregister);
+
+    #10 rst = 0;
+
+    #10 mode = 2'b00;
+
+    #10 sr_in = 1; mode = 2'b01;
+    #10 sr_in = 0;
+
+    #10 sl_in = 1; mode = 2'b10;
+    #10 sl_in = 0;
+
+    #10 mode = 2'b11;
+    #10 mode = 2'b11;
+
+    #10 mode = 2'b00;
+
+    #20 $finish;
+  end
+
+  initial begin
+    $monitor("T=%0t | mode=%b | sr_in=%b | sl_in=%b | q=%b",
+              $time, mode, sr_in, sl_in, q);
+  end
+
+endmodule
