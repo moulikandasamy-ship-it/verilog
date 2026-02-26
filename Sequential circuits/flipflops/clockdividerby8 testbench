@@ -1,0 +1,32 @@
+module tb_clock_divider_by_8;
+
+  reg clk;
+  reg rst;
+  wire clk_div8;
+
+  clock_divider_by_8 dut (
+    .clk(clk),
+    .rst(rst),
+    .clk_div8(clk_div8)
+  );
+
+  always #5 clk = ~clk;
+
+  initial begin
+    clk = 0;
+    rst = 1;
+
+    $dumpfile("clock_divider_by_8.vcd");
+    $dumpvars(0, tb_clock_divider_by_8);
+
+    #10 rst = 0;
+
+    #200 $finish;
+  end
+
+  initial begin
+    $monitor("T=%0t | clk=%b | clk_div8=%b", 
+              $time, clk, clk_div8);
+  end
+
+endmodule
