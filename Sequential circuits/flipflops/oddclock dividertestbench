@@ -1,0 +1,26 @@
+
+module tb_odd_divider_by3_simple;
+
+reg clk, rst;
+wire clk_div3;
+
+odd_divider_by3_simple dut (
+    .clk(clk),
+    .rst(rst),
+    .clk_div3(clk_div3)
+);
+
+always #5 clk = ~clk;
+
+initial begin
+    $dumpfile("odd_divider_by3.vcd");
+    $dumpvars(0, tb_odd_divider_by3_simple);
+
+    clk = 0;
+    rst = 1;
+
+    #15 rst = 0;
+    #150 $finish;
+end
+
+endmodule
