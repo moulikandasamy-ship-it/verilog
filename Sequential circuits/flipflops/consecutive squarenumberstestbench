@@ -1,0 +1,29 @@
+module tb_square_odd_series;
+
+    reg clk;
+    reg rst;
+    wire [15:0] square;
+
+    square_odd_series dut (
+        .clk(clk),
+        .rst(rst),
+        .square(square)
+    );
+
+    always #5 clk = ~clk;
+
+    initial begin
+        clk = 0;
+        rst = 1;
+
+        #10 rst = 0;
+
+        #100 $finish;
+    end
+
+    initial begin
+        $display("Time\tSquare");
+        $monitor("%0t\t%0d", $time, square);
+    end
+
+endmodule
