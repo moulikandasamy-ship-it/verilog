@@ -1,0 +1,41 @@
+module tb_prime_detector;
+
+    reg clk;
+    reg rst;
+    reg [7:0] num;
+    wire prime;
+
+    prime_detector dut (
+        .clk(clk),
+        .rst(rst),
+        .num(num),
+        .prime(prime)
+    );
+
+    always #5 clk = ~clk;
+
+    initial begin
+        clk = 0;
+        rst = 1;
+        num = 0;
+
+        #10 rst = 0;
+
+        #10 num = 1;  
+        #20 num = 2;   
+        #20 num = 3;   
+        #20 num = 4;   
+        #20 num = 5;   
+        #20 num = 6;   
+        #20 num = 7;   
+        #20 num = 9;   
+        #20 num = 11;  
+
+        #50 $finish;
+    end
+
+    initial begin
+        $monitor("Time=%0t  Num=%0d  Prime=%b", $time, num, prime);
+    end
+
+endmodule
