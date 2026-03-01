@@ -1,0 +1,20 @@
+module rising_edge_detector (
+    input   clk,
+    input   rst,
+    input   signal_in,
+    output reg  edge_pulse
+);
+
+    reg signal_d;  
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            signal_d   <= 0;
+            edge_pulse <= 0;
+        end else begin
+            edge_pulse <= signal_in & ~signal_d;
+            signal_d   <= signal_in;
+        end
+    end
+
+endmodule
