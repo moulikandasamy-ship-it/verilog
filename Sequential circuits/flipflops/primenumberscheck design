@@ -1,0 +1,40 @@
+module prime_detector (
+    input        clk,
+    input        rst,
+    input  [7:0] num,
+    output reg   prime
+);
+
+    reg [7:0] i;
+    reg checking;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            prime    <= 0;
+            i        <= 2;
+            checking <= 0;
+        end else begin
+            if (!checking) begin
+                if (num <= 1) begin
+                    prime <= 0;
+                end else begin
+                    prime    <= 1;   
+                    i        <= 2;
+                    checking <= 1;
+                end
+            end
+            else begin
+                if (i < num) begin
+                    if (num % i == 0) begin
+                        prime    <= 0; 
+                        checking <= 0;
+                    end
+                    i <= i + 1;
+                end else begin
+                    checking <= 0;
+                end
+            end
+        end
+    end
+
+endmodule
