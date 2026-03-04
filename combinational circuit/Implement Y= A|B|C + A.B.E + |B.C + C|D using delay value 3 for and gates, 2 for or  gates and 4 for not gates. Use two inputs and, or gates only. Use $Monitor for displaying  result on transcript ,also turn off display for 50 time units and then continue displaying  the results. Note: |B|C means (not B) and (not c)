@@ -1,0 +1,27 @@
+module logic_circuit(A,B,C,D,E,Y);
+
+input A,B,C,D,E;
+output Y;
+
+wire nA,nB,nC,nD;
+wire t1a,t1;
+wire t2a,t2;
+wire t3;
+wire t4;
+wire y1,y2;
+
+not #4 g1(nA,A);
+not #4 g2(nB,B);
+not #4 g3(nC,C);
+not #4 g4(nD,D);
+and #3 g5(t1a,nA,B);
+and #3 g6(t1,t1a,nC);
+and #3 g7(t2a,A,B);
+and #3 g8(t2,t2a,E);
+and #3 g9(t3,nB,nC);
+and #3 g10(t4,C,nD);
+or #2 g11(y1,t1,t2);
+or #2 g12(y2,t3,t4);
+or #2 g13(Y,y1,y2);
+
+endmodule
