@@ -1,0 +1,52 @@
+
+module tb_configurable_adder;
+
+reg  [7:0]  a8,b8;
+reg  [15:0] a16,b16;
+reg cin;
+
+wire [7:0]  sum8;
+wire [15:0] sum16;
+wire cout8,cout16;
+
+
+configurable_adder #(.WIDTH(8)) ADD8 (
+    .a(a8),
+    .b(b8),
+    .cin(cin),
+    .sum(sum8),
+    .cout(cout8)
+);
+
+
+configurable_adder #(.WIDTH(16)) ADD16 (
+    .a(a16),
+    .b(b16),
+    .cin(cin),
+    .sum(sum16),
+    .cout(cout16)
+);
+
+
+initial
+begin
+
+cin = 0;
+
+a8 = 8'd25; 
+b8 = 8'd10;
+#5 $strobe("8-bit: A=%d B=%d Cin=%d Sum=%d Cout=%d",a8,b8,cin,sum8,cout8);
+
+a16 = 16'd1000;
+b16 = 16'd24;
+#5 $strobe("16-bit: A=%d B=%d Cin=%d Sum=%d Cout=%d",a16,b16,cin,sum16,cout16);
+
+a8 = 8'd200;
+b8 = 8'd100;
+#5 $strobe("8-bit: A=%d B=%d Cin=%d Sum=%d Cout=%d",a8,b8,cin,sum8,cout8);
+
+#10 $finish;
+
+end
+
+endmodule
