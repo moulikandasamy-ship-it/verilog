@@ -1,0 +1,41 @@
+module tb_sr_ff;
+
+reg s, r, clk, rst;
+wire q;
+
+
+sr_ff uut (
+    .s(s),
+    .r(r)
+    .clk(clk),
+    .rst(rst),
+    .q(q)
+);
+
+
+always #5 clk = ~clk;
+
+initial begin
+   
+    $dumpfile("sr_ff.vcd");
+    $dumpvars(0, tb_sr_ff);
+
+ 
+    clk = 0;
+    rst = 1;
+    s = 0;
+    r = 0;
+
+    #10 rst = 0;
+
+    #10 s = 0; r = 0; 
+    #10 s = 0; r = 1; 
+    #10 s = 1; r = 0; 
+    #10 s = 1; r = 1; 
+    #10 s = 1; r = 1; 
+    #10 s = 0; r = 0; 
+
+    #20 $finish;
+end
+
+endmodule
