@@ -1,0 +1,43 @@
+module memory_operations;
+
+    reg [7:0] mem [0:7][0:13];
+
+    integer i, j;
+    integer total;
+    reg [7:0] max_val;
+
+    task fill_memory;
+        begin
+      for (i = 0; i < 8; i = i + 1)
+           for (j = 0; j < 14; j = j + 1)
+             mem[i][j] = i + j;   
+        end
+    endtask
+
+    task add_memory;
+        begin
+            total = 0;
+         for (i = 0; i < 8; i = i + 1)
+           for (j = 0; j < 14; j = j + 1)
+              total = total + mem[i][j];
+        end
+    endtask
+
+    task find_max;
+        begin
+            max_val = mem[0][0];
+            for (i = 0; i < 8; i = i + 1)
+             for (j = 0; j < 14; j = j + 1)
+               if (mem[i][j] > max_val)
+                 max_val = mem[i][j];
+        end
+    endtask
+    initial begin
+      
+        fill;        
+        add_all;     
+        find_max;  
+
+        $display("Sum = %0d", sum);
+        $display("Max = %0d", max);
+endmodule
