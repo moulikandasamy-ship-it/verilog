@@ -1,0 +1,43 @@
+module tb_seq_10110;
+
+    reg clk;
+    reg rst;
+    reg x;
+    wire y;
+
+    seq_10110_moore dut (
+        .clk(clk),
+        .rst(rst),
+        .x(x),
+        .y(y)
+    );
+
+    always #5 clk = ~clk;
+
+    initial begin
+        $dumpfile("seq_10110.vcd");
+        $dumpvars(0, tb_seq_10110);
+        $monitor("Time=%0t rst=%b x=%b y=%b", $time, rst, x, y);
+
+        clk = 0;
+        rst = 1;
+        x   = 0;
+
+        #12 rst = 0;
+
+        #10 x = 1;
+        #10 x = 0;
+        #10 x = 1;
+        #10 x = 1;
+        #10 x = 0;
+        #10 x = 1;
+        #10 x = 0;
+        #10 x = 1;
+        #10 x = 1;
+        #10 x = 0;
+
+
+        #20 $finish;
+    end
+
+endmodul
