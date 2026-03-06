@@ -1,0 +1,55 @@
+module memory_example;
+
+reg [13:0] mem [7:0];
+integer i;
+reg [20:0] sum;
+reg [13:0] largest;
+
+
+task fill_memory;
+begin
+    for(i=0;i<8;i=i+1)
+        mem[i] = i*5;   
+end
+endtask
+
+function [20:0] add_memory;
+integer j;
+begin
+    add_memory = 0;
+    
+    for(j=0;j<8;j=j+1)
+        add_memory = add_memory + mem[j];
+end
+endfunction
+
+function [13:0] find_max;
+integer k;
+begin
+    find_max = mem[0];
+    
+    for(k=1;k<8;k=k+1)
+        if(mem[k] > find_max)
+            find_max = mem[k];
+end
+endfunction
+
+
+initial
+begin
+
+fill_memory();
+
+sum = add_memory();
+largest = find_max();
+
+$display("Memory values:");
+for(i=0;i<8;i=i+1)
+    $display("mem[%0d] = %0d",i,mem[i]);
+
+$display("Sum of memory values = %0d",sum);
+$display("Largest value = %0d",largest);
+
+end
+
+endmodule
