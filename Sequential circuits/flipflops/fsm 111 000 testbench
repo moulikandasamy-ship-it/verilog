@@ -1,0 +1,42 @@
+
+module tb_fsm_111_000;
+
+    reg clk;
+    reg rst;
+    reg x;
+    wire y;
+
+    fsm_111_000 dut (
+        .clk(clk),
+        .rst(rst),
+        .x(x),
+        .y(y)
+    );
+
+    always #5 clk = ~clk;
+
+    initial begin
+        $dumpfile("fsm_111_000.vcd");
+        $dumpvars(0, tb_fsm_111_000);
+        $monitor("Time=%0t rst=%b x=%b y=%b", $time, rst, x, y);
+
+        clk = 0;
+        rst = 1;
+        x   = 0;
+
+        #12 rst = 0;
+
+        #10 x = 1;
+        #10 x = 1;
+        #10 x = 1;
+        #10 x = 1;   
+        #10 x = 0;
+        #10 x = 0;
+        #10 x = 0;
+        #10 x = 0;
+        #10 x = 0;  
+
+        #20 $finish;
+    end
+
+endmodule
