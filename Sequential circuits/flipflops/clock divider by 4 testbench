@@ -1,0 +1,32 @@
+module tb_clock_divider_by_4;
+
+  reg clk;
+  reg rst;
+  wire clk_div4;
+
+  clock_divider_by_4 dut (
+    .clk(clk),
+    .rst(rst),
+    .clk_div4(clk_div4)
+  );
+
+  always #5 clk = ~clk;
+
+  initial begin
+    clk = 0;
+    rst = 1;
+
+    $dumpfile("clock_divider_by_4.vcd");
+    $dumpvars(0, tb_clock_divider_by_4);
+
+    #10 rst = 0;
+
+    #200 $finish;
+  end
+
+  initial begin
+    $monitor("T=%0t | clk=%b | clk_div4=%b", 
+              $time, clk, clk_div4);
+  end
+
+endmodule
