@@ -1,0 +1,51 @@
+
+module tb_single_port_mem;
+
+reg clk;
+reg we;
+reg [2:0] addr;
+reg [7:0] din;
+
+wire [7:0] dout;
+
+single_port_mem uut(
+    .clk(clk),
+    .we(we),
+    .addr(addr),
+    .din(din),
+    .dout(dout)
+);
+
+always #5 clk = ~clk;
+
+initial
+begin
+    $dumpfile("memory.vcd");
+    $dumpvars(0,tb_single_port_mem);
+end
+
+initial
+begin
+    clk = 0;
+    we = 0;
+    addr = 0;
+    din = 0;
+    we = 1;
+    addr = 3'b000; din = 8'h11; #10;
+    addr = 3'b001; din = 8'h22; #10;
+    addr = 3'b010; din = 8'h33; #10;
+    addr = 3'b011; din = 8'h44; #10;
+    we = 0;
+
+    addr = 3'b000; #10;
+    addr = 3'b001; #10;
+    addr = 3'b010; #10;
+    addr = 3'b011; #10;
+
+    #20 $finish;
+end
+initial
+$monitor("time=%0t we=%b addr=%b din=%h dout=%h",
+         $time,we,addr,din,dout);
+
+endmodule
