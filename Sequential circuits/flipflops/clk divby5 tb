@@ -1,0 +1,30 @@
+module clk_div_tb;
+
+reg clk;
+reg rst;
+
+wire clk_div5_out;
+
+
+clk_div5 u2(
+    .clk(clk),
+    .rst(rst),
+    .clk_out(clk_div5_out)
+);
+
+always #5 clk = ~clk;
+
+initial
+begin
+    $dumpfile("clock_div.vcd");
+    $dumpvars(0,clk_div_tb);
+
+    clk = 0;
+    rst = 1;
+
+    #10 rst = 0;
+
+    #200 $finish;
+end
+
+endmodule
