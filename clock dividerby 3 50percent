@@ -1,0 +1,38 @@
+module clk_div3 (
+    input clk,
+    input rst,
+    output clk_out
+);
+
+reg [1:0] count;
+reg clk_pos, clk_neg;
+
+always @(posedge clk or posedge rst)
+begin
+    if(rst)
+    begin
+        count <= 0;
+        clk_pos <= 0;
+    end
+    else
+    begin
+        count <= count + 1;
+        if(count == 2)
+        begin
+            clk_pos <= ~clk_pos;
+            count <= 0;
+        end
+    end
+end
+
+always @(negedge clk or posedge rst)
+begin
+    if(rst)
+        clk_neg <= 0;
+    else if(count == 2)
+        clk_neg <= ~clk_neg;
+end
+
+assign clk_out = clk_pos | clk_neg;
+
+endmodule
