@@ -1,0 +1,186 @@
+module apb_master(
+input pclk,
+input prst,
+input transfer,
+input pread_or_write,
+input [7:0] apb_write_addr,
+input [7:0] apb_read_addr,
+input [7:0] apb_write_data,
+input [7:0] prdata,
+input pready,
+
+output reg psel,
+output reg penable,
+output reg pwrite,
+output reg [7:0] paddr,
+output reg [7:0] pwdata,
+output reg [7:0] apb_read_data
+);
+
+parameter IDLE=2'b00,
+          SETUP=2'b01,
+          ACCESS=2'b10;
+
+reg [1:0] state,next_state;
+
+always @(posedge pclk or posedge prst)
+begin
+    if(prst)
+        state <= IDLE;
+    else
+        state <= next_state;
+end
+
+always @(*)
+begin
+case(state)
+
+IDLE:
+begin
+    if(transfer)
+        next_state = SETUP;
+    else
+        next_state = IDLE;
+end
+
+SETUP:
+begin
+    next_state = ACCESS;
+end
+
+ACCESS:
+begin
+    if(pready && transfer)
+        next_state = SETUP;
+    else if(pready && !transfer)
+        next_state = IDLE;
+    else
+        next_state = ACCESS;
+end
+
+default: next_state = IDLE;
+
+endcase
+end
+
+
+always @(posedge pclk)
+begin
+case(state)
+
+IDLE:
+begin
+    psel <= 0;
+    penable <= 0;
+end
+
+SETUP:
+begin
+    psel <= 1;
+    penable <= 0;
+
+    if(pread_or_write)
+    begin
+        pwrite <= 1;
+        paddr  <= apb_write_addr;
+        pwdata <= apb_write_data;
+    end
+    else
+    begin
+        pwrite <= 0;
+        paddr  <= apb_read_addr;
+    end
+end
+
+ACCESS:
+begin
+    penable <= 1;
+
+    if(!pwrite)
+        apb_read_data <= prdata;
+end
+
+endcase
+end
+
+endmodule
+
+module slave(
+input pwrite,
+input psel,
+input pclk,
+input penable,
+input [7:0] paddr,
+input [7:0] pwdata,
+output reg [7:0] prdata,
+output reg pready
+);
+
+reg [7:0] mem [255:0];
+
+always @(posedge pclk)
+begin
+    pready <= 1;
+
+    if(psel && penable && pwrite)
+        mem[paddr] <= pwdata;
+
+    else if(psel && penable && !pwrite)
+        prdata <= mem[paddr];
+end
+
+endmodule
+
+
+
+module top(
+ input pclk,
+ input prst,
+ input transfer,
+ input pread_or_write,
+ input [7:0] apb_write_addr,
+ input [7:0] apb_read_addr,
+ input [7:0] apb_write_data,
+ output [7:0] apb_read_data
+);
+
+wire psel;
+wire penable;
+wire pwrite;
+wire [7:0] paddr;
+wire [7:0] pwdata;
+wire [7:0] prdata;
+wire pready;
+
+
+apb_master u_master(
+.pclk(pclk),
+.prst(prst),
+.transfer(transfer),
+.pread_or_write(pread_or_write),
+.apb_write_addr(apb_write_addr),
+.apb_read_addr(apb_read_addr),
+.apb_write_data(apb_write_data),
+.prdata(prdata),
+.pready(pready),
+.psel(psel),
+.penable(penable),
+.pwrite(pwrite),
+.paddr(paddr),
+.pwdata(pwdata),
+.apb_read_data(apb_read_data)
+);
+
+
+slave u_slave(
+.pclk(pclk),
+.pwrite(pwrite),
+.psel(psel),
+.penable(penable),
+.paddr(paddr),
+.pwdata(pwdata),
+.prdata(prdata),
+.pready(pready)
+);
+
+endmodule
