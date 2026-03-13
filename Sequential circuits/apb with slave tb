@@ -1,0 +1,58 @@
+module tb;
+
+reg pclk;
+reg prst;
+reg transfer;
+reg pread_or_write;
+
+reg [7:0] apb_write_addr;
+reg [7:0] apb_read_addr;
+reg [7:0] apb_write_data;
+
+wire [7:0] apb_read_data;
+
+top dut (
+.pclk(pclk),
+.prst(prst),
+.transfer(transfer),
+.pread_or_write(pread_or_write),
+.apb_write_addr(apb_write_addr),
+.apb_read_addr(apb_read_addr),
+.apb_write_data(apb_write_data),
+.apb_read_data(apb_read_data)
+);
+
+always #5 pclk = ~pclk;
+
+initial begin
+
+$dumpfile("apb.vcd");
+$dumpvars(0,tb);
+
+pclk = 0;
+prst = 1;
+transfer = 0;
+
+#10 prst = 0;
+
+#20 transfer = 1;
+pread_or_write = 1;
+apb_write_addr = 8'h10;
+apb_write_data = 8'h00;
+
+#30 transfer = 1;
+pread_or_write = 0;
+apb_read_addr = 8'h10;
+
+#20 transfer = 0;
+
+#40 $finish;
+
+end
+
+initial
+$monitor("Time=%0t | transfer=%b | write_addr=%h | write_data=%h | read_data=%h",
+$time, transfer, apb_write_addr, apb_write_data, apb_read_data);
+
+endmodule
+      
