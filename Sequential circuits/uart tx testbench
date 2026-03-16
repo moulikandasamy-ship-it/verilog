@@ -1,0 +1,51 @@
+
+module tb_uart_tx;
+
+reg clk;
+reg rst;
+reg [7:0] din;
+reg tx_start;
+
+wire txout;
+uart_tx dut(
+    .clk(clk),
+    .rst(rst),
+    .din(din),
+    .tx_start(tx_start),
+    .txout(txout)
+);
+
+
+always #5 clk = ~clk;
+
+
+initial
+begin
+    clk = 0;
+    rst = 1;
+    tx_start = 0;
+    din = 8'b10101010;
+
+    #20
+    rst = 0;
+
+    #10
+    tx_start = 1;
+
+    #10
+    tx_start = 0;
+
+    #200
+
+    $finish;
+end
+
+
+
+initial
+begin
+    $dumpfile("uart_tx.vcd");
+    $dumpvars(0,tb_uart_tx);
+end
+
+endmodule
