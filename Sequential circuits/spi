@@ -1,0 +1,244 @@
+
+module spi_top(
+
+    input clk,
+    input reset,
+    input start,
+
+    input  [7:0] master_tx_data,
+    input  [7:0] slave_tx_data,
+
+    output [7:0] master_rx_data,
+    output [7:0] slave_rx_data,
+
+    output done
+
+);
+
+    wire sclk;
+    wire ss;
+
+    wire mosi;
+    wire miso;
+
+    spi_master MASTER (
+
+        .clk(clk),
+        .reset(reset),
+        .start(start),
+
+        .tx_data(master_tx_data),
+        .miso(miso),
+
+        .sclk(sclk),
+        .mosi(mosi),
+        .ss(ss),
+
+        .rx_data(master_rx_data),
+        .done(done)
+
+    );
+
+    spi_slave SLAVE (
+
+        .sclk(sclk),
+        .reset(reset),
+        .ss(ss),
+
+        .mosi(mosi),
+
+        .tx_data(slave_tx_data),
+
+        .miso(miso),
+        .rx_data(slave_rx_data)
+
+    );
+
+endmodule
+
+module spi_master(
+
+    input clk,
+    input reset,
+    input start,
+
+    input [7:0] tx_data,
+    input miso,
+
+    output reg sclk,
+    output reg mosi,
+    output reg ss,
+
+    output reg [7:0] rx_data,
+    output reg done
+
+);
+
+    localparam IDLE = 2'd0,
+               LOAD = 2'd1,
+               LOW  = 2'd2,
+               HIGH = 2'd3;
+
+                reg [1:0] state;
+
+    reg [7:0] shift_tx;
+    reg [7:0] shift_rx;
+
+    reg [2:0] bit_count;
+
+    always @(posedge clk or posedge reset) begin
+
+        if(reset) begin
+
+            state <= IDLE;
+
+            sclk <= 0;
+            ss   <= 1;
+            mosi <= 0;
+
+            done <= 0;
+
+            shift_tx <= 0;
+            shift_rx <= 0;
+
+               bit_count <= 0;
+
+            rx_data <= 0;
+
+        end
+
+        else begin
+
+            case(state)
+
+            IDLE: begin
+
+                sclk <= 0;
+                ss   <= 1;
+
+                done <= 0;
+
+                if(start)
+                    state <= LOAD;
+
+            end
+
+            LOAD: begin
+
+                ss <= 0;
+
+                shift_tx <= tx_data;
+                shift_rx <= 0;
+
+                bit_count <= 0;
+
+                mosi <= tx_data[7];
+
+                state <= LOW;
+
+            end
+
+            LOW: begin
+
+                sclk <= 0;
+
+                state <= HIGH;
+
+            end
+
+            HIGH: begin
+
+                sclk <= 1;
+
+                shift_rx <= {shift_rx[6:0], miso};
+
+                shift_tx <= shift_tx << 1;
+
+                mosi <= shift_tx[6];
+
+                bit_count <= bit_count + 1;
+
+                if(bit_count == 3'd7) begin
+
+                    rx_data <= {shift_rx[6:0], miso};
+
+                    done <= 1;
+
+                    state <= IDLE;
+
+                end
+
+                else
+                    state <= LOW;
+
+            end
+
+            endcase
+
+        end
+
+    end
+
+endmodule
+
+module spi_slave(
+
+    input sclk,
+    input reset,
+    input ss,
+
+    input mosi,
+
+    input [7:0] tx_data,
+
+    output reg miso,
+    output reg [7:0] rx_data
+
+);
+
+    reg [7:0] shift_tx;
+    reg [7:0] shift_rx;
+
+    reg [2:0] bit_count;
+
+    always @(posedge sclk or posedge reset) begin
+
+        if(reset) begin
+
+            shift_tx <= 0;
+            shift_rx <= 0;
+
+            rx_data <= 0;
+
+            bit_count <= 0;
+
+            miso <= 0;
+
+        end
+
+        else if(!ss) begin
+
+            if(bit_count == 0)
+                shift_tx <= tx_data;
+
+            miso <= shift_tx[7];
+
+            shift_tx <= shift_tx << 1;
+
+            shift_rx <= {shift_rx[6:0], mosi};
+
+            bit_count <= bit_count + 1;
+
+            if(bit_count == 3'd7) begin
+
+                rx_data <= {shift_rx[6:0], mosi};
+
+                bit_count <= 0;
+
+            end
+
+        end
+
+    end
+
+endmodule
