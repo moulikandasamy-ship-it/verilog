@@ -1,0 +1,74 @@
+
+module apb_alu (
+    input     PCLK,
+    input    PRESETn,
+
+    input   PSEL,
+    input   PENABLE,
+    input   PWRITE,
+    input  [7:0]  PADDR,
+    input  [31:0] PWDATA,
+    output reg [31:0] PRDATA,
+    output  PREADY,
+
+    output        PSLVERR
+);
+
+    reg [31:0] operand_a;
+    reg [31:0] operand_b;
+    reg [1:0]  opcode;
+    reg [31:0] result;
+
+    assign PREADY  = 1'b1;
+    assign PSLVERR = 1'b0;
+
+    always @(posedge PCLK or negedge PRESETn) begin
+        if (!PRESETn) begin
+            operand_a <= 32'd0;
+            operand_b <= 32'd0;
+            opcode    <= 2'd0;
+        end
+        else begin
+            if (PSEL && PENABLE && PWRITE) begin
+                case (PADDR)
+
+                    8'h00: operand_a <= PWDATA;
+                    8'h04: operand_b <= PWDATA;
+                    8'h08: opcode    <= PWDATA[1:0];
+
+                    default: ;
+                endcase
+            end
+        end
+    end
+
+    always @(*) begin
+        case (opcode)
+
+            2'b00: result = operand_a + operand_b;
+            2'b01: result = operand_a - operand_b;
+            2'b10: result = operand_a & operand_b;
+            2'b11: result = operand_a | operand_b;
+
+            default: result = 32'd0;
+        endcase
+    end
+
+    always @(*) begin
+        if (PSEL && !PWRITE) begin
+            case (PADDR)
+
+                8'h00: PRDATA = operand_a;
+                8'h04: PRDATA = operand_b;
+                8'h08: PRDATA = {30'd0, opcode};
+                8'h0C: PRDATA = result;
+
+                default: PRDATA = 32'd0;
+            endcase
+        end
+        else begin
+            PRDATA = 32'd0;
+        end
+    end
+
+endmodule
